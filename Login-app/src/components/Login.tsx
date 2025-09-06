@@ -1,6 +1,3 @@
-import React from "react";
-
-
 const Login = () => {
   return (
     <div className="flex items-center justify-center bg-[#B6B6B6] w-[1420px] h-[980px] mx-auto">
@@ -58,11 +55,15 @@ const Login = () => {
             <div className="w-full h-[100px] flex flex-col gap-2">
               <div className="w-full h-[46px] rounded-2xl border border-gray-300 flex justify-start items-center gap-2 pt-[13px] pr-[12px] pb-[13px] pl-[12px]">
                 <img src="/icons/GG-icon.svg" />
-                <p className="text-[16px]/[20px] font-normal">Continue with Goggle</p>
+                <p className="text-[16px]/[20px] font-normal">
+                  Continue with Goggle
+                </p>
               </div>
               <div className="w-full h-[46px] rounded-2xl border border-gray-300 flex justify-start items-center gap-2 pt-[13px] pr-[12px] pb-[13px] pl-[12px]">
                 <img src="/icons/bold.svg" />
-                <p className="text-[16px]/[20px] font-normal">Login with Linked Passkey</p>
+                <p className="text-[16px]/[20px] font-normal">
+                  Login with Linked Passkey
+                </p>
               </div>
             </div>
           </div>
@@ -72,8 +73,4 @@ const Login = () => {
   );
 };
 
-
 export default Login;
-
-
-
