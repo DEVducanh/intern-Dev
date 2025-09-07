@@ -1,2 +1,36 @@
+/* Komplekt Bold */
+@font-face {
+  font-family: "Komplekt";
+  src: url("/fonts/komplekt070_bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
 
+/* Komplekt Medium */
+@font-face {
+  font-family: "Komplekt";
+  src: url("/fonts/komplekt070_medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Rubik Medium */
+@font-face {
+  font-family: "Rubik";
+  src: url("/fonts/rubik_medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+/* Rubik Regular */
+@font-face {
+  font-family: "Rubik";
+  src: url("/fonts/rubik_regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
 @import "tailwindcss";
+
+* {
+    box-sizing: border-box;
+}
