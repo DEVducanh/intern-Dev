@@ -18,7 +18,7 @@ const TodoList = () => {
 
   // Xóa Task
   const { mutate } = useMutation({
-    mutationFn: async (id: any) => {
+    mutationFn: async (id: string) => {
       return axios.delete(`http://localhost:3001/tasks/${id}`);
     },
     onSuccess: () => {
@@ -26,7 +26,7 @@ const TodoList = () => {
     },
   });
 
-  const deleteTask = async (id: any) => {
+  const deleteTask = async (id: string) => {
     if (window.confirm("Xoa ?")) {
       mutate(id);
     }

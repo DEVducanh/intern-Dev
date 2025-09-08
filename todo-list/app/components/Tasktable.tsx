@@ -5,7 +5,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import useCreate from "../hook/useCreate";
 import { useForm } from "react-hook-form";
-import { DndContext, useDraggable, useDroppable } from "@dnd-kit/core";
+import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 
 function DraggableTask({
@@ -69,7 +69,7 @@ const Tasktable = () => {
     handleSubmit: handleSubmitAdd,
     formState: { errors: errorsAdd },
   } = useForm<ITask>();
-  const { data, isLoading, error } = useQuery<ITask[]>({
+  const { data } = useQuery<ITask[]>({
     queryKey: ["task"],
     queryFn: async () => {
       const res = await axios.get("http://localhost:3001/tasks");
@@ -125,7 +125,7 @@ const Tasktable = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["task"] }),
   });
 
-  const onDragEnd = (event: any) => {
+  const onDragEnd = (event: DragEndEvent) => {
     const { over, active } = event;
     if (!over) return;
 
@@ -143,8 +143,7 @@ const Tasktable = () => {
     doing: "Đang làm",
     done: "Đã xong",
   };
-  //   if (isLoading) return <p>Loading...</p>;
-  //   if (error instanceof Error) return <p>Error: {error.message}</p>;
+ 
   return (
     <body className="bg-gray-700  min-h-screen p-6 text-white">
       <DndContext onDragEnd={onDragEnd}>
