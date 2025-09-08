@@ -1,36 +1,25 @@
 {
   "tasks": [
     {
-      "text": "NFaa",
+      "text": "NFaa ",
       "id": "cb60"
     },
     {
-      "id": "0730",
-      "text": "@Anhnguyen191023"
+      "text": "@Anhnguyen19",
+      "id": "0730"
     },
     {
-      "text": "1jhkjhkjhk",
-      "id": "e67d"
-    },
-    {
-      "id": "f601",
-      "text": "@Anhnguyen191023"
-    },
-    {
-      "id": "2f21",
-      "text": "NFA"
-    },
-    {
-      "id": "f3fd",
-      "text": "@Anhnguyen191023"
-    },
-    {
-      "id": "84da",
-      "text": "play Fifa "
-    },
-    {
-      "id": "0ce9",
+      "id": "f888",
       "text": "play Fifa with sister"
+    },
+    {
+      "id": "0067",
+      "text": "@Anhnguyen191023"
+    },
+    {
+      "id": "a159",
+      "text": "play Fifa with ",
+      "status": "todo"
     }
   ]
 }
