@@ -146,11 +146,15 @@ const Tasktable = () => {
     }
   };
 
-  // const columns = {
-  //   todo: "Cần làm",
-  //   doing: "Đang làm",
-  //   done: "Đã xong",
-  // };
+  const deleteTask = useMutation({
+    mutationFn: async (id: string) => axios.delete(`/api/tasks/${id}`),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Delete ?")) return;
+    deleteTask.mutate(id);
+  };
 
   const columns = useMemo(() => {
     return [
@@ -210,12 +214,21 @@ const Tasktable = () => {
                     ) : (
                       <>
                         <span>{task.text}</span>
-                        <button
-                          className="px-2 py-1 bg-blue-500 text-white text-sm rounded"
-                          onClick={() => setEditingId(task._id)}
-                        >
-                          Edit
-                        </button>
+                        {task.status === "done" ? (
+                          <button
+                            className="px-2 py-1 bg-red-500 text-white text-sm rounded"
+                            onClick={() => handleDelete(task._id)}
+                          >
+                            Delete
+                          </button>
+                        ) : (
+                          <button
+                            className="px-2 py-1 bg-blue-500 text-white text-sm rounded"
+                            onClick={() => setEditingId(task._id)}
+                          >
+                            Edit
+                          </button>
+                        )}
                       </>
                     )}
                   </div>
