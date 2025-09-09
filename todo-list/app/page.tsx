@@ -4,8 +4,8 @@ import Tasktable from "./components/Tasktable";
 
 export default function Home() {
   return (
-    <html className="max-w-4xl mx-auto mt-4 bg-blue-600">
+    <>
       <Tasktable />
-    </html>
+    </>
   );
 }

@@ -1,12 +1,18 @@
 "use client";
-import { ITask } from "@/types/task";
+import { ITask } from "@/types/task.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import useCreate from "../hook/useCreate";
 import { useForm } from "react-hook-form";
-import { DndContext, DragEndEvent, useDraggable, useDroppable } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  useDraggable,
+  useDroppable,
+} from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { ITaskDocument } from "./../models/task.model";
 
 function DraggableTask({
   task,
@@ -16,7 +22,7 @@ function DraggableTask({
   children: React.ReactNode;
 }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: task.id.toString(),
+    id: task._id,
   });
 
   const style = {
@@ -69,10 +75,11 @@ const Tasktable = () => {
     handleSubmit: handleSubmitAdd,
     formState: { errors: errorsAdd },
   } = useForm<ITask>();
+
   const { data } = useQuery<ITask[]>({
-    queryKey: ["task"],
+    queryKey: ["tasks"],
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3001/tasks");
+      const res = await axios.get("/api/tasks");
       return res.data;
     },
   });
@@ -80,7 +87,7 @@ const Tasktable = () => {
   const onSubmit = (value: ITask) => {
     createTask.mutate({
       ...value,
-      status: "todo", // mặc định khi thêm task
+      // status: "todo", // mặc định khi thêm task
     });
     setShowInput(false);
   };
@@ -95,7 +102,7 @@ const Tasktable = () => {
   } = useForm<{ text: string }>();
 
   // Chọn task để edit
-  const taskToEdit = data?.find((task) => task.id === editingId);
+  const taskToEdit = data?.find((task) => task._id === editingId);
 
   useEffect(() => {
     if (taskToEdit) {
@@ -106,30 +113,31 @@ const Tasktable = () => {
   const Edit = useMutation({
     mutationFn: async (value: { text: string }) => {
       if (!taskToEdit) return;
-      return axios.patch(`http://localhost:3001/tasks/${taskToEdit.id}`, value);
+      return axios.put(`/api/tasks/${taskToEdit._id}`, value);
     },
     onSuccess: () => {
       alert("Success");
       setEditingId(null); // tắt edit
-      queryClient.invalidateQueries({ queryKey: ["task"] });
+      queryClient.invalidateQueries({ queryKey: ["tasks"] });
     },
   });
 
   const OnEdit = (value: { text: string }) => {
     Edit.mutate(value);
   };
+
   // Update lại status
   const updateStatus = useMutation({
     mutationFn: async (task: ITask) =>
-      axios.put(`http://localhost:3001/tasks/${task.id}`, task),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["task"] }),
+      axios.put(`/api/tasks/${task._id}`, task),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["tasks"] }),
   });
 
   const onDragEnd = (event: DragEndEvent) => {
     const { over, active } = event;
     if (!over) return;
 
-    const task = data?.find((t) => t.id.toString() === active.id);
+    const task = data?.find((t) => t._id === active.id);
     if (!task) return;
 
     // Nếu thả vào cột mới → update status
@@ -138,63 +146,81 @@ const Tasktable = () => {
     }
   };
 
-  const columns = {
-    todo: "Cần làm",
-    doing: "Đang làm",
-    done: "Đã xong",
-  };
- 
+  // const columns = {
+  //   todo: "Cần làm",
+  //   doing: "Đang làm",
+  //   done: "Đã xong",
+  // };
+
+  const columns = useMemo(() => {
+    return [
+      {
+        colId: "todo",
+        title: "Cần Làm",
+        dataList: (data || [])?.filter((task) => task.status === "todo"),
+      },
+      {
+        colId: "doing",
+        title: "Đang Làm",
+        dataList: (data || [])?.filter((task) => task.status === "doing"),
+      },
+      {
+        colId: "done",
+        title: "Đã xong",
+        dataList: (data || [])?.filter((task) => task.status === "done"),
+      },
+    ];
+  }, [data]);
+
   return (
-    <body className="bg-gray-700  min-h-screen p-6 text-white">
+    <div className=" bg-gray-700  min-h-screen p-6 text-white">
       <DndContext onDragEnd={onDragEnd}>
         <div className="flex space-x-4">
-          {Object.entries(columns).map(([colId, title]) => (
+          {columns.map(({ colId, title, dataList }) => (
             <DroppableColumn id={colId} key={colId}>
               <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
-              {data
-                ?.filter((task) => task.status === colId)
-                .map((task) => (
-                  <DraggableTask key={task.id} task={task}>
-                    {/* Giữ nguyên UI task của bạn ở đây */}
-                    <div className="bg-gray-700 p-3 rounded-md flex justify-between items-center mb-2">
-                      {editingId === task.id ? (
-                        <form
-                          onSubmit={handleSubmitEdit(OnEdit)}
-                          className="flex space-x-2 w-full"
+              {dataList?.map((task) => (
+                <DraggableTask key={task._id} task={task}>
+                  {/* Giữ nguyên UI task của bạn ở đây */}
+                  <div className="bg-gray-700 p-3 rounded-md flex justify-between items-center mb-2">
+                    {editingId === task._id ? (
+                      <form
+                        onSubmit={handleSubmitEdit(OnEdit)}
+                        className="flex space-x-2 w-full"
+                      >
+                        <input
+                          {...registerEdit("text", { required: true })}
+                          className="border px-2 py-1 rounded flex-1 text-black"
+                        />
+                        <button
+                          type="submit"
+                          className="px-3 py-1 bg-green-500 text-white rounded"
                         >
-                          <input
-                            {...registerEdit("text", { required: true })}
-                            className="border px-2 py-1 rounded flex-1 text-black"
-                          />
-                          <button
-                            type="submit"
-                            className="px-3 py-1 bg-green-500 text-white rounded"
-                          >
-                            Save
-                          </button>
-                          <button
-                            type="button"
-                            className="px-3 py-1 bg-yellow-400 text-white rounded"
-                            onClick={() => setEditingId(null)}
-                          >
-                            Cancel
-                          </button>
-                        </form>
-                      ) : (
-                        <>
-                          <span>{task.text}</span>
-                          <button
-                            className="px-2 py-1 bg-blue-500 text-white text-sm rounded"
-                            onClick={() => setEditingId(task.id)}
-                          >
-                            Edit
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </DraggableTask>
-                ))}
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-1 bg-yellow-400 text-white rounded"
+                          onClick={() => setEditingId(null)}
+                        >
+                          Cancel
+                        </button>
+                      </form>
+                    ) : (
+                      <>
+                        <span>{task.text}</span>
+                        <button
+                          className="px-2 py-1 bg-blue-500 text-white text-sm rounded"
+                          onClick={() => setEditingId(task._id)}
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </DraggableTask>
+              ))}
 
               {/* Giữ nguyên form thêm task của bạn */}
               {colId === "todo" && showInput && (
@@ -234,7 +260,7 @@ const Tasktable = () => {
           ))}
         </div>
       </DndContext>
-    </body>
+    </div>
   );
 };
 

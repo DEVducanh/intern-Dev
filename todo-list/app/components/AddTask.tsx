@@ -1,6 +1,6 @@
 "use client";
 
-import { ITask } from "@/types/task";
+import { ITask } from "@/types/task.type";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import React from "react";

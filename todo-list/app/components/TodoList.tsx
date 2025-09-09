@@ -1,5 +1,5 @@
 "use client";
-import { ITask } from "@/types/task";
+import { ITask } from "@/types/task.type";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
@@ -38,7 +38,7 @@ const TodoList = () => {
   const { register, handleSubmit, reset } = useForm<{ text: string }>();
 
   // Chọn task để edit
-  const taskToEdit = data?.find((task) => task.id === editingId);
+  const taskToEdit = data?.find((task) => task._id === editingId);
 
   // Khi bắt đầu edit → reset form
   useEffect(() => {
@@ -51,7 +51,7 @@ const TodoList = () => {
   const Edit = useMutation({
     mutationFn: async (value: { text: string }) => {
       if (!taskToEdit) return;
-      return axios.put(`http://localhost:3001/tasks/${taskToEdit.id}`, value);
+      return axios.put(`http://localhost:3001/tasks/${taskToEdit._id}`, value);
     },
     onSuccess: () => {
       alert("Success");
@@ -66,6 +66,7 @@ const TodoList = () => {
   // -----------------------------------------------------
   if (isLoading) return <p>Loading...</p>;
   if (error instanceof Error) return <p>Error: {error.message}</p>;
+  
   return (
     <div className="overflow-x-auto">
       <table className="table-auto w-full border-collapse border border-gray-300">
@@ -77,9 +78,9 @@ const TodoList = () => {
         </thead>
         <tbody>
           {data?.map((task) => (
-            <tr key={task.id} className="hover:bg-gray-50 transition-colors">
+            <tr key={task._id} className="hover:bg-gray-50 transition-colors">
               <td className="px-4 py-2 border border-gray-300">
-                {editingId === task.id ? (
+                {editingId === task._id ? (
                   <form
                     onSubmit={handleSubmit(OnEdit)}
                     className="flex space-x-2"
@@ -107,16 +108,16 @@ const TodoList = () => {
                 )}
               </td>
               <td className="px-4 py-2 border border-gray-300 text-center space-x-2">
-                {editingId !== task.id && (
+                {editingId !== task._id && (
                   <button
                     className="px-2 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
-                    onClick={() => setEditingId(task.id)}
+                    onClick={() => setEditingId(task._id)}
                   >
                     Edit
                   </button>
                 )}
                 <button
-                  onClick={() => deleteTask(task.id)}
+                  onClick={() => deleteTask(task._id)}
                   className="px-2 py-1 text-sm bg-red-500 text-white rounded hover:bg-red-600"
                 >
                   Xóa
